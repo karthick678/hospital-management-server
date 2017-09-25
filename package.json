@@ -4,9 +4,13 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "async": "^2.5.0",
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
+    "jsonwebtoken": "^7.4.1",
     "mongoose": "^4.11.9",
+    "mongoose-activitylogs": "^2.1.15",
+    "mongoose-history": "^0.4.2",
     "mongoose-paginate": "^5.0.3"
   },
   "devDependencies": {},
