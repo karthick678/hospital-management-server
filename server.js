@@ -28,6 +28,22 @@ app.use(function(req, res, next) {
     next();
 });
 
+/*---------------------------------------------------------
+add user
+---------------------------------------------------------*/
+app.post('/api/createUser', function(req, res) {
+    var user = new Users(req.body.tamilanda);
+    if (req.body.tamilanda) {
+        user.save(function(err, createUser) {
+            if (err) {
+                throw err;
+            } else {
+                res.json(createUser);
+            }
+        });
+    }
+});
+
 app.post('/api/authenticate', function(req, res) {
     Users.findOne({
         email: req.body.email
@@ -50,6 +66,7 @@ app.post('/api/authenticate', function(req, res) {
                 res.json({
                     success: true,
                     message: 'Enjoy your token!',
+                    id: user._id,
                     name: user.name,
                     email: user.email,
                     token: token
@@ -103,6 +120,17 @@ apiRoutes.use(function(req, res, next) {
 
 });
 
+/** ---------------- User Api's ---------------------------- */
+/** ---------------------------------------------------------- */
+apiRoutes.get('/getUserDetails/:id', function(req, res) {
+    var id = req.params.id;
+    Users.findOne({ _id: id }, function(err, user) {
+        delete user.password;
+        if (err) throw err;
+        res.json(user);
+    });
+});
+
 
 /** ---------------- Patient Api's ---------------------------- */
 /** ---------------------------------------------------------- */
@@ -149,7 +177,7 @@ apiRoutes.put('/updatePatientDetails/:id', function(req, res) {
 
 apiRoutes.delete('/deletePatient/:id', function(req, res) {
     var id = req.params.id;
-    Patient.findOneAndRemove({ _id: id }, function(err) {
+    Patient.findOneAndRemove({ _id: id }, function(err, patient) {
         if (err) throw err;
     })
 });
@@ -224,7 +252,7 @@ apiRoutes.post('/createDoctorDetails', function(req, res) {
     var doctor = new Doctor(req.body);
     doctor.save(function(err, createDoctor) {
         if (err) {
-            throw err;
+            res.send(500, err);
         } else {
             res.json(createDoctor);
         }
@@ -256,6 +284,14 @@ apiRoutes.delete('/deleteDoctor/:id', function(req, res) {
     Doctor.findOneAndRemove({ _id: id }, function(err, doctor) {
         if (err) throw err;
         res.json({ message: 'Success' });
+    })
+});
+
+apiRoutes.get('/getDoctorsName', function(req, res) {
+    var id = req.params.id;
+    Doctor.find({}, 'name', function(err, doctorsName) {
+        if (err) throw err;
+        res.json(doctorsName);
     })
 });
 
@@ -304,7 +340,7 @@ apiRoutes.put('/updateStockDetails/:id', function(req, res) {
 
 apiRoutes.delete('/deleteStock/:id', function(req, res) {
     var id = req.params.id;
-    Stock.findOneAndRemove({ _id: id }, function(err) {
+    Stock.findOneAndRemove({ _id: id }, function(err, stock) {
         if (err) throw err;
         res.json({ message: 'Success' });
     })
@@ -366,16 +402,16 @@ apiRoutes.delete('/deleteCategory/:id', function(req, res) {
 /** ------------------------------------------------------- */
 
 apiRoutes.get('/getDoumentsCount', function(req, res) {
-    getDoumentsCount(function(err, res) {
+    getDoumentsCount(function(err, documents) {
         if (err) throw err;
-        res.json(res);
+        res.json(documents);
     });
 });
 
 apiRoutes.get('/getBloodGroupCount', function(req, res) {
-    getBloodGroupCount(function(err, res) {
+    getBloodGroupCount(function(err, bloodGroup) {
         if (err) throw err;
-        res.json(res);
+        res.json(bloodGroup);
     });
 });
 
@@ -399,23 +435,23 @@ apiRoutes.post('/getExpiredMedicines', function(req, res) {
 var getDoumentsCount = function(callback) {
     async.parallel({
         doctorFind: function(cb) { Doctor.count().exec(cb); },
-        doctorInactiveFind: function(cb) { Doctor.count({ status: true }).exec(cb); },
+        doctorActiveFind: function(cb) { Doctor.count({ status: true }).exec(cb); },
         patientFind: function(cb) { Patient.count().exec(cb); },
-        patientInactiveFind: function(cb) { Patient.count({ status: true }).exec(cb); },
+        patientActiveFind: function(cb) { Patient.count({ status: true }).exec(cb); },
         stockFind: function(cb) { Stock.count().exec(cb); },
-        stockInactiveFind: function(cb) { Stock.count({ status: true }).exec(cb); },
+        stockActiveFind: function(cb) { Stock.count({ status: true }).exec(cb); },
         categoryFind: function(cb) { Category.count().exec(cb); },
-        categoryInactiveFind: function(cb) { Category.count({ status: true }).exec(cb); }
+        categoryActiveFind: function(cb) { Category.count({ status: true }).exec(cb); }
     }, function(err, result) {
         var res = {};
         res.doctor = result.doctorFind;
-        res.doctorInactive = result.doctorInactiveFind;
+        res.doctorActive = result.doctorActiveFind;
         res.patient = result.patientFind;
-        res.patientInactive = result.patientInactiveFind;
+        res.patientActive = result.patientActiveFind;
         res.stock = result.stockFind;
-        res.stockInactive = result.stockInactiveFind;
+        res.stockActive = result.stockActiveFind;
         res.category = result.categoryFind;
-        res.categoryInactive = result.categoryInactiveFind;
+        res.categoryActive = result.categoryActiveFind;
         callback(err, res);
     });
 };

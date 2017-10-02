@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
     mongoosePaginate = require('mongoose-paginate');
 
 var schema = new mongoose.Schema({
-    name: String,
+    name: { type: String, unique: true },
     status: Boolean,
     description: String
 });
@@ -11,8 +11,8 @@ var schema = new mongoose.Schema({
 schema.plugin(mongoosePaginate);
 schema.plugin(mongooseActivityLog, {
     schemaName: "Category",
-    createAction: "created",
-    updateAction: "updated",
-    deleteAction: "deleted"
+    createAction: "Created",
+    updateAction: "Updated",
+    deleteAction: "Deleted"
 });
 module.exports = mongoose.model('Category', schema);

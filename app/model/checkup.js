@@ -20,8 +20,8 @@ var schema = new mongoose.Schema({
 schema.plugin(mongoosePaginate);
 schema.plugin(mongooseActivityLog, {
     schemaName: "Checkup",
-    createAction: "created",
-    updateAction: "updated",
-    deleteAction: "deleted"
+    createAction: "Created",
+    updateAction: "Updated",
+    deleteAction: "Deleted"
 });
 module.exports = mongoose.model('Checkup', schema);

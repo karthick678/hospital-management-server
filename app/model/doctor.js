@@ -4,22 +4,22 @@ var mongoose = require('mongoose'),
 
 var schema = new mongoose.Schema({
     name: {
-        first: String,
+        first: { type: String, required: true },
         middle: String,
         last: String
     },
-    email: String,
-    gender: String,
-    mobileNumber: String,
+    email: { type: String, unique: true, required: true },
+    gender: { type: String, required: true },
+    mobileNumber: { type: String, unique: true, required: true },
     phoneNumber: String,
-    status: Boolean
+    status: { type: Boolean, required: true },
 });
 
 schema.plugin(mongoosePaginate);
 schema.plugin(mongooseActivityLog, {
     schemaName: "Doctor",
-    createAction: "created",
-    updateAction: "updated",
-    deleteAction: "deleted"
+    createAction: "Created",
+    updateAction: "Updated",
+    deleteAction: "Deleted"
 });
 module.exports = mongoose.model('Doctor', schema);

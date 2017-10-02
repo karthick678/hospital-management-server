@@ -4,5 +4,6 @@ var mongoose = require('mongoose'),
 module.exports = mongoose.model('Users', new Schema({
 	name: String,
 	email: String,
-	password: String
+	password: String,
+	mobileNumber: String
 }))

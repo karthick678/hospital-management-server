@@ -25,8 +25,8 @@ var schema = new mongoose.Schema({
 schema.plugin(mongoosePaginate);
 schema.plugin(mongooseActivityLog, {
     schemaName: "Patient",
-    createAction: "created",
-    updateAction: "updated",
-    deleteAction: "deleted"
+    createAction: "Created",
+    updateAction: "Updated",
+    deleteAction: "Deleted"
 });
 module.exports = mongoose.model('Patient', schema);

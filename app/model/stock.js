@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
     mongoosePaginate = require('mongoose-paginate');
 
 var schema = new mongoose.Schema({
-    name: String,
+    name: { type: String, unique: true },
     category: String,
     status: Boolean,
     price: String,
@@ -19,8 +19,8 @@ var schema = new mongoose.Schema({
 schema.plugin(mongoosePaginate);
 schema.plugin(mongooseActivityLog, {
     schemaName: "Stock",
-    createAction: "created",
-    updateAction: "updated",
-    deleteAction: "deleted"
+    createAction: "Created",
+    updateAction: "Updated",
+    deleteAction: "Deleted"
 });
 module.exports = mongoose.model('Stock', schema);
