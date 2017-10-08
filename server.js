@@ -87,8 +87,6 @@ apiRoutes.use(function(req, res, next) {
         next();
     }
 
-
-
     // decode token
     if (req.method !== 'OPTIONS') {
 
@@ -252,7 +250,7 @@ apiRoutes.post('/createDoctorDetails', function(req, res) {
     var doctor = new Doctor(req.body);
     doctor.save(function(err, createDoctor) {
         if (err) {
-            res.send(500, err);
+            res.send(500, { error: err });
         } else {
             res.json(createDoctor);
         }
@@ -272,7 +270,7 @@ apiRoutes.put('/updateDoctorDetails/:id', function(req, res) {
         doctor = new Doctor(req.body);
     Doctor.findOneAndUpdate({ _id: id }, doctor, function(err, updateDoctor) {
         if (err) {
-            throw err
+            res.send(500, { error: err });
         } else {
             res.json(doctor);
         }
@@ -314,7 +312,7 @@ apiRoutes.post('/createStockDetails', function(req, res) {
     var stock = new Stock(req.body);
     stock.save(function(err, createStock) {
         if (err) {
-            throw err;
+            res.send(500, { error: err });
         } else {
             res.json(createStock);
         }
@@ -333,8 +331,11 @@ apiRoutes.put('/updateStockDetails/:id', function(req, res) {
     var id = req.params.id,
         stock = new Stock(req.body);
     Stock.findOneAndUpdate({ _id: id }, stock, function(err, updateStock) {
-        if (err) throw err;
-        res.json(stock);
+        if (err) {
+            res.send(500, { error: err });
+        } else {
+            res.json(stock);
+        }
     });
 });
 
@@ -366,7 +367,7 @@ apiRoutes.post('/createCategoryDetails', function(req, res) {
     var category = new Category(req.body);
     category.save(function(err, createCategory) {
         if (err) {
-            throw err;
+            res.send(500, { error: err });
         } else {
             res.json(createCategory);
         }
@@ -385,8 +386,11 @@ apiRoutes.put('/updateCategoryDetails/:id', function(req, res) {
     var id = req.params.id,
         category = new Category(req.body);
     Category.findOneAndUpdate({ _id: id }, category, function(err, updateCategory) {
-        if (err) throw err;
-        res.json(category);
+        if (err) {
+            res.send(500, { error: err });
+        } else {
+            res.json(category);
+        }
     });
 });
 

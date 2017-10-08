@@ -8,7 +8,7 @@ var schema = new mongoose.Schema({
         middle: String,
         last: String
     },
-    email: { type: String, unique: true, required: true },
+    email: { type: String, required: true },
     gender: { type: String, required: true },
     mobileNumber: { type: String, unique: true, required: true },
     phoneNumber: String,
