@@ -9,7 +9,7 @@ var schema = new mongoose.Schema({
         last: String
     },
     dob: Date,
-    gender: String,
+    gender: { type: String, required: true },
     address: {
         address1: String,
         address2: String,
@@ -17,9 +17,10 @@ var schema = new mongoose.Schema({
         state: String,
         pincode: String
     },
-    mobileNumber: String,
+    mobileNumber: { type: String, required: true },
     phoneNumber: String,
-    bloodGroup: String
+    bloodGroup: String,
+    status: { type: Boolean, required: true }
 });
 
 schema.plugin(mongoosePaginate);

@@ -144,16 +144,68 @@ apiRoutes.post('/getPatients', function(req, res) {
     });
 });
 
+var stringToLowerCase = function(input) {
+    if (input)
+        return input.toLowerCase()
+};
+
+var findPatientByMobileNumber = function(patient, callback) {
+    async.parallel({
+        patients: function(cb) {
+            Patient.find(patient).exec(cb);
+        }
+    }, function(err, result) {
+        callback(err, result);
+    });
+};
+
+var checkPatientExists = function(searchQuery, patients) {
+    var result = [];
+    if (patients.length) {
+        var index, patientsLength = patients.length;
+        for (index = 0; index < patientsLength; index++) {
+            var patient = patients[index];
+            var first = stringToLowerCase(patient.name.first),
+                middle = stringToLowerCase(patient.name.middle),
+                last = stringToLowerCase(patient.name.last);
+            if (first === searchQuery.first && (middle === searchQuery.middle || middle === undefined) && (last === searchQuery.last || last === undefined)) {
+                result.push(patient);
+            }
+        }
+    }
+    return result;
+};
+
+
 apiRoutes.post('/createPatientDetails', function(req, res) {
     delete req.body._id;
     var patient = new Patient(req.body);
-    patient.save(function(err, createPatient) {
-        if (err) {
-            throw err;
+
+    var doc = {
+        mobileNumber: patient.mobileNumber,
+        first: stringToLowerCase(patient.name.first),
+        middle: stringToLowerCase(patient.name.middle),
+        last: stringToLowerCase(patient.name.last)
+    };
+
+    findPatientByMobileNumber({ mobileNumber: doc.mobileNumber }, function(err, documents) {
+        var patients = checkPatientExists(doc, documents.patients);
+        if (patients.length) {
+            return res.status(500).send({
+                patients: patients,
+                code: 11000
+            });
         } else {
-            res.json(createPatient);
+            patient.save(function(err, createPatient) {
+                if (err) {
+                    throw err;
+                } else {
+                    res.json(createPatient);
+                }
+            });
         }
     });
+
 });
 
 apiRoutes.get('/getPatientDetails/:id', function(req, res) {
@@ -167,16 +219,36 @@ apiRoutes.get('/getPatientDetails/:id', function(req, res) {
 apiRoutes.put('/updatePatientDetails/:id', function(req, res) {
     var id = req.params.id,
         patient = new Patient(req.body);
-    Patient.findOneAndUpdate({ _id: id }, patient, function(err, updatePatient) {
-        if (err) throw err;
-        res.json(patient);
+
+    var doc = {
+        mobileNumber: patient.mobileNumber,
+        first: stringToLowerCase(patient.name.first),
+        middle: stringToLowerCase(patient.name.middle),
+        last: stringToLowerCase(patient.name.last)
+    };
+
+    findPatientByMobileNumber({ mobileNumber: doc.mobileNumber }, function(err, documents) {
+        var patients = checkPatientExists(doc, documents.patients);
+        if (patients.length && patients[0]._id != id) {
+            return res.status(500).send({
+                patients: patients,
+                code: 11000
+            });
+        } else {
+            Patient.findOneAndUpdate({ _id: id }, patient, function(err, updatePatient) {
+                if (err) throw err;
+                res.json(patient);
+            });
+        }
     });
+
 });
 
 apiRoutes.delete('/deletePatient/:id', function(req, res) {
     var id = req.params.id;
     Patient.findOneAndRemove({ _id: id }, function(err, patient) {
         if (err) throw err;
+        res.json({ message: 'Success' });
     })
 });
 
@@ -233,6 +305,14 @@ apiRoutes.delete('/deleteCheckup/:id', function(req, res) {
 });
 /** --------------- Doctor Api's ----------------------- */
 /** --------------------------------------------------- */
+apiRoutes.get('/getAllDoctors', function(req, res) {
+    var id = req.params.id;
+    Doctor.find({}, function(err, doctors) {
+        if (err) throw err;
+        res.json(doctors);
+    })
+});
+
 apiRoutes.post('/getDoctors', function(req, res) {
     var query = req.body.query,
         page = parseInt(req.body.page) + 1,
@@ -292,6 +372,7 @@ apiRoutes.get('/getDoctorsName', function(req, res) {
         res.json(doctorsName);
     })
 });
+
 
 /** --------------- Stock Api's ----------------------- */
 /** --------------------------------------------------- */
@@ -433,8 +514,6 @@ apiRoutes.post('/getExpiredMedicines', function(req, res) {
         res.json(medicinies);
     });
 });
-
-
 
 var getDoumentsCount = function(callback) {
     async.parallel({
