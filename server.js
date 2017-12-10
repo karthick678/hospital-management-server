@@ -428,6 +428,18 @@ apiRoutes.delete('/deleteStock/:id', function(req, res) {
     })
 });
 
+apiRoutes.post('/getMedicines', function(req, res) {
+    var searchText = req.body.searchText,
+        status = req.body.status;
+    if (searchText) {
+        Stock.find({ 'name': { '$regex': searchText, '$options': 'i' }, 'status': status }, function(err, medicines) {
+            if (err) throw err;
+            res.json(medicines);
+        });
+    } else {
+        res.json({});
+    }
+});
 
 /** --------------- Categories Api's ----------------------- */
 /** --------------------------------------------------- */
