@@ -42,6 +42,7 @@ app.post('/api/createUser', function(req, res) {
             }
         });
     }
+	
 });
 
 app.post('/api/authenticate', function(req, res) {
