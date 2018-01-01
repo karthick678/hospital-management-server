@@ -441,6 +441,14 @@ apiRoutes.post('/getMedicines', function(req, res) {
     }
 });
 
+apiRoutes.post('/getAllMedicines', function(req, res) {
+    var query = req.body;
+    Stock.find(query, function(err, medicines) {
+        if (err) throw err;
+        res.json(medicines);
+    });
+});
+
 /** --------------- Categories Api's ----------------------- */
 /** --------------------------------------------------- */
 apiRoutes.post('/getCategories', function(req, res) {
@@ -493,6 +501,14 @@ apiRoutes.delete('/deleteCategory/:id', function(req, res) {
         if (err) throw err;
         res.json({ message: 'Success' });
     })
+});
+
+apiRoutes.post('/getAllCategories', function(req, res) {
+    var query = req.params;
+    Category.find(query, function(err, categories) {
+        if (err) throw err;
+        res.json(categories);
+    });
 });
 
 /** --------------- Dashboard Api's ----------------------- */
