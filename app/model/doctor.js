@@ -12,6 +12,8 @@ var schema = new mongoose.Schema({
     gender: { type: String, required: true },
     mobileNumber: { type: String, unique: true, required: true },
     phoneNumber: String,
+    qualification: String,
+    specialist: String,
     status: { type: Boolean, required: true },
 });
 

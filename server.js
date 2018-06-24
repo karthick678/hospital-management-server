@@ -15,6 +15,7 @@ var Users = require('./app/model/user.js'),
     Category = require('./app/model/category.js'),
     ActivityLog = require('./app/model/activity-log.js');
 
+mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://127.0.0.1:27017/hms', {
     useMongoClient: true
 });
@@ -42,7 +43,7 @@ app.post('/api/createUser', function(req, res) {
             }
         });
     }
-	
+
 });
 
 app.post('/api/authenticate', function(req, res) {
@@ -90,7 +91,6 @@ apiRoutes.use(function(req, res, next) {
 
     // decode token
     if (req.method !== 'OPTIONS') {
-
         // check header or url parameters or post parameters for token
         var token = req.body.token || req.param('token') || req.headers['authorization'];
         if (token) {
@@ -262,7 +262,12 @@ apiRoutes.post('/getCheckups', function(req, res) {
         limit = parseInt(req.body.limit);
     Checkup.paginate(query, {
         page: page,
-        limit: limit
+        limit: limit,
+        populate: [
+          { path: 'patientId', model: Patient },
+          { path: 'prescription.stockId', model: Stock },
+          { path: 'doctorId', model: Doctor }
+        ]
     }, function(err, result) {
         res.json(result);
     });
@@ -383,7 +388,8 @@ apiRoutes.post('/getStocks', function(req, res) {
         limit = parseInt(req.body.limit);
     Stock.paginate(query, {
         page: page,
-        limit: limit
+        limit: limit,
+        populate: { path: 'category', model: Category }
     }, function(err, result) {
         res.json(result);
     });
@@ -592,7 +598,7 @@ var getBloodGroupCount = function(callback) {
     });
 };
 
-app.use('/api/hms', apiRoutes);
+app.use('/hms/api', apiRoutes);
 
 app.listen(port);
 console.log("Application running on port" + port);

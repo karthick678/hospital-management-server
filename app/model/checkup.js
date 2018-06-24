@@ -1,27 +1,40 @@
 var mongoose = require('mongoose'),
-    mongooseActivityLog = require('./../plugin/mongoose-activity-log/mongoose-activity-log.js'),
-    mongoosePaginate = require('mongoose-paginate');
+  Schema = mongoose.Schema,
+  mongooseActivityLog = require('./../plugin/mongoose-activity-log/mongoose-activity-log.js'),
+  mongoosePaginate = require('mongoose-paginate'),
+  patient = require('./patient'),
+  doctor = require('./doctor'),
+  stock = require('./stock');
 
-var schema = new mongoose.Schema({
-    patientId: String,
-    doctorName: String,
-    symptoms: String,
-    diagnosis: String,
-    checkupDate: Date,
-    prescription: [{
-        medicine: String,
-        noOfDays: Number,
-        whenToTake: String,
-        beforeMeal: Boolean
-    }],
-    extraNotes: String,
+var schema = Schema({
+  patientId: {
+    type: Schema.Types.ObjectId,
+    ref: 'patient'
+  },
+  symptoms: String,
+  diagnosis: String,
+  checkupDate: Date,
+  prescription: [{
+    noOfDays: Number,
+    whenToTake: String,
+    beforeMeal: Boolean,
+    stockId: {
+      type: Schema.Types.ObjectId,
+      ref: 'stock'
+    }
+  }],
+  extraNotes: String,
+  doctorId: {
+    type: Schema.Types.ObjectId,
+    ref: 'doctor'
+  }
 });
 
 schema.plugin(mongoosePaginate);
 schema.plugin(mongooseActivityLog, {
-    schemaName: "Checkup",
-    createAction: "Created",
-    updateAction: "Updated",
-    deleteAction: "Deleted"
+  schemaName: "Checkup",
+  createAction: "Created",
+  updateAction: "Updated",
+  deleteAction: "Deleted"
 });
 module.exports = mongoose.model('Checkup', schema);

@@ -1,10 +1,11 @@
 var mongoose = require('mongoose'),
+    Schema = mongoose.Schema,
     mongooseActivityLog = require('./../plugin/mongoose-activity-log/mongoose-activity-log.js'),
-    mongoosePaginate = require('mongoose-paginate');
+    mongoosePaginate = require('mongoose-paginate'),
+    category = require('./category');
 
-var schema = new mongoose.Schema({
+var schema = Schema({
     name: { type: String, unique: true },
-    category: String,
     status: Boolean,
     price: String,
     qty: String,
@@ -13,7 +14,11 @@ var schema = new mongoose.Schema({
     effects: String,
     effects: String,
     expireDate: Date,
-    description: String
+    description: String,
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: 'category'
+    }
 });
 
 schema.plugin(mongoosePaginate);
